@@ -77,15 +77,21 @@
       }
       
       setupCanvas() {
-        // Fixed size for top-right positioning
+        // Responsive size based on container
         this.canvas.style.width = '100%';
         this.canvas.style.height = '100%';
+        
+        // Get actual container dimensions
+        const container = this.canvas.parentElement;
+        const containerRect = container.getBoundingClientRect();
+        const containerWidth = containerRect.width;
+        const containerHeight = containerRect.height;
         
         // Set optimized resolution for smooth performance
         const pixelRatio = window.devicePixelRatio || 1;
         const superSamplingRatio = 2; // 2x supersampling for balance of quality and performance
-        this.canvas.width = 700 * pixelRatio * superSamplingRatio;
-        this.canvas.height = 500 * pixelRatio * superSamplingRatio;
+        this.canvas.width = containerWidth * pixelRatio * superSamplingRatio;
+        this.canvas.height = containerHeight * pixelRatio * superSamplingRatio;
         
         this.ctx.scale(pixelRatio * superSamplingRatio, pixelRatio * superSamplingRatio);
         this.ctx.strokeWidth = 1.0;
@@ -96,16 +102,29 @@
         this.ctx.lineCap = 'round';
         this.ctx.lineJoin = 'round';
         
-        this.width = 700;
-        this.height = 500;
+        this.width = containerWidth;
+        this.height = containerHeight;
         this.centerX = this.width / 2;
         this.centerY = this.height / 2;
-        this.scale = 2;  // Larger scale for bigger animation
+        
+        // Scale proportionally based on container size
+        // Base scale for 700px width container
+        const baseScale = 2;
+        this.scale = baseScale * (containerWidth / 700);
       }
       
       setupEventListeners() {
+        let resizeTimeout;
         window.addEventListener('resize', () => {
-          this.setupCanvas();
+          clearTimeout(resizeTimeout);
+          resizeTimeout = setTimeout(() => {
+            // Clear trails and repopulate for new dimensions
+            this.attractors.forEach(attractor => {
+              attractor.trail = [];
+            });
+            this.setupCanvas();
+            this.prePopulateTrails();
+          }, 150);
         });
       }
       

@@ -204,9 +204,11 @@ footer p {
     margin-top: 40px;
   }
   
-  /* Hide animation on tablet and mobile for clean layout */
+  /* Scale animation for tablet */
   .lorenz-container {
-    display: none;
+    right: 8px;
+    width: 350px;
+    height: 250px;
   }
 }
 
@@ -243,9 +245,12 @@ footer p {
     margin-bottom: 25px;
   }
   
-  /* Hide animation on mobile for clean layout */
+  /* Scale animation for mobile */
   .lorenz-container {
-    display: none;
+    top: -24px;
+    right: -15px;
+    width: 300px;
+    height: 220px;
   }
 }
 
@@ -273,9 +278,11 @@ footer p {
     margin-top: 30px;
   }
   
-  /* Hide animation on landscape mobile for clean layout */
+  /* Scale animation for landscape mobile */
   .lorenz-container {
-    display: none;
+    right: 5px;
+    width: 180px;
+    height: 120px;
   }
 }
   
