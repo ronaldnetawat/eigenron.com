@@ -49,6 +49,7 @@ body {
 
 /* Header */
 header {
+  margin-top: 30px;
   margin-bottom: 40px;
   background-color: transparent !important;
   background: none !important;
@@ -107,7 +108,7 @@ main {
 .greeting {
   font-size: 28px;
   font-weight: normal;
-  margin-bottom: 30px;
+  margin-bottom: 10px;
   color: #000;
 }
 
@@ -174,6 +175,7 @@ footer p {
   }
   
   header {
+    margin-top: 20px;
     margin-bottom: 30px;
   }
   
@@ -211,6 +213,7 @@ footer p {
   }
   
   header {
+    margin-top: 15px;
     margin-bottom: 25px;
   }
 }
@@ -222,6 +225,7 @@ footer p {
   }
   
   header {
+    margin-top: 10px;
     margin-bottom: 20px;
   }
   
