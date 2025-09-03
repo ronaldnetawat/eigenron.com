@@ -100,9 +100,30 @@ nav {
   background-color: transparent !important;
 }
 
+/* Lorenz Attractor Animation */
+.lorenz-container {
+  position: absolute;
+  /* top: 0; */
+  bottom: 270px;
+  right: 90px;
+  width: 700px;
+  height: 500px;
+  pointer-events: none;
+  z-index: -1;
+}
+
+#lorenzCanvas {
+  display: block;
+  background: transparent;
+  width: 100% !important;
+  height: 100% !important;
+}
+
 /* Main content */
 main {
   flex: 1;
+  position: relative;
+  z-index: 1;
 }
 
 .greeting {
@@ -182,6 +203,11 @@ footer p {
   footer {
     margin-top: 40px;
   }
+  
+  /* Hide animation on tablet and mobile for clean layout */
+  .lorenz-container {
+    display: none;
+  }
 }
 
 @media screen and (max-width: 480px) {
@@ -216,6 +242,11 @@ footer p {
     margin-top: 15px;
     margin-bottom: 25px;
   }
+  
+  /* Hide animation on mobile for clean layout */
+  .lorenz-container {
+    display: none;
+  }
 }
 
 /* Landscape mobile orientation */
@@ -240,6 +271,11 @@ footer p {
   
   footer {
     margin-top: 30px;
+  }
+  
+  /* Hide animation on landscape mobile for clean layout */
+  .lorenz-container {
+    display: none;
   }
 }
   

@@ -22,7 +22,11 @@
     </header>
     
     <main>
-      <h2 class="greeting">hi!</h2>
+      <!-- Lorenz Attractor Animation Background -->
+      <div class="lorenz-container">
+        <canvas id="lorenzCanvas"></canvas>
+      </div>
+      <h2 class="greeting">hi.</h2>
       
       <div class="bio">
         <p>i am ron! i'm glad you're here :)</p>
@@ -30,6 +34,8 @@
         <p>i studied <strong>physics</strong>, <strong>math</strong> and <strong>computer science</strong> (and often, philosophy) in my undergrad. i've researched <strong>phase qubits</strong> for my senior (theoretical) research, and currently living in florida, working on a startup, on ml infra!</p>
         
         <p>i love physics, data-driven engineering, and coding things up from scratch, like GPT-2, Llama-2, amongst other things.</p>
+
+        <p>i’ve also built Stable-Diffusion v1.5 from scratch, implemented GANs and diffusion models, written my own autograd engine for physics-aware problems, and spun up everything from small a chess engine to protein-folding inspired architectures.</p>
         
         <p>i have pivoted from research-based methods to ai engineering and infra and i love low-level stuff (quantum mechanics womp).</p>
         
@@ -37,5 +43,170 @@
       </div>
     </main>
   </div>
+
+  <script>
+    class LorenzAttractor {
+      constructor(canvas) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.setupCanvas();
+        
+        // Lorenz parameters
+        this.sigma = 10.0;
+        this.rho = 28.0;
+        this.beta = 8.0 / 3.0;
+        this.dt = 0.01;
+        
+        // Animation settings
+        this.maxTrailLength = 300;
+        this.fadeSpeed = 0.02;
+        
+        // Multiple initial conditions with neon colors
+        this.attractors = [
+          { x: 1, y: 1, z: 1, trail: [], color: '#00FFFF' },      // Cyan
+          { x: 2, y: 1, z: 1, trail: [], color: '#FF00FF' },      // Magenta
+          { x: 1, y: 2, z: 1, trail: [], color: '#FFFF00' },      // Yellow
+          { x: 1, y: 1, z: 2, trail: [], color: '#00FF00' },      // Green
+          { x: -1, y: -1, z: 1, trail: [], color: '#FF4000' },    // Orange
+          { x: 0.5, y: -0.5, z: 1.5, trail: [], color: '#8000FF' } // Purple
+        ];
+        
+        this.setupEventListeners();
+        this.prePopulateTrails(); // Pre-populate for smooth start
+        this.animate();
+      }
+      
+      setupCanvas() {
+        // Fixed size for top-right positioning
+        this.canvas.style.width = '100%';
+        this.canvas.style.height = '100%';
+        
+        // Set optimized resolution for smooth performance
+        const pixelRatio = window.devicePixelRatio || 1;
+        const superSamplingRatio = 2; // 2x supersampling for balance of quality and performance
+        this.canvas.width = 700 * pixelRatio * superSamplingRatio;
+        this.canvas.height = 500 * pixelRatio * superSamplingRatio;
+        
+        this.ctx.scale(pixelRatio * superSamplingRatio, pixelRatio * superSamplingRatio);
+        this.ctx.strokeWidth = 1.0;
+        
+        // Enable high-quality rendering for smooth lines
+        this.ctx.imageSmoothingEnabled = true;
+        this.ctx.imageSmoothingQuality = 'high';
+        this.ctx.lineCap = 'round';
+        this.ctx.lineJoin = 'round';
+        
+        this.width = 700;
+        this.height = 500;
+        this.centerX = this.width / 2;
+        this.centerY = this.height / 2;
+        this.scale = 2;  // Larger scale for bigger animation
+      }
+      
+      setupEventListeners() {
+        window.addEventListener('resize', () => {
+          this.setupCanvas();
+        });
+      }
+      
+      prePopulateTrails() {
+        // Pre-calculate some trail points for smooth startup
+        for (let step = 0; step < 100; step++) {
+          this.attractors.forEach(attractor => {
+            const [dx, dy, dz] = this.lorenzEquations(attractor.x, attractor.y, attractor.z);
+            
+            attractor.x += dx;
+            attractor.y += dy;
+            attractor.z += dz;
+            
+            const [screenX, screenY] = this.projectTo2D(attractor.x, attractor.y, attractor.z);
+            attractor.trail.push([screenX, screenY]);
+          });
+        }
+      }
+      
+      lorenzEquations(x, y, z) {
+        const dx = this.sigma * (y - x) * this.dt;
+        const dy = (x * (this.rho - z) - y) * this.dt;
+        const dz = (x * y - this.beta * z) * this.dt;
+        return [dx, dy, dz];
+      }
+      
+      projectTo2D(x, y, z) {
+        // Front view of butterfly - X-Z plane projection centered on screen
+        // This shows the classic butterfly shape head-on with wider aspect ratio
+        return [
+          this.centerX + x * this.scale * 2,  // 1.5x wider horizontally
+          this.centerY - (z - 15) * this.scale  // Center around z=25 (typical Lorenz center)
+        ];
+      }
+      
+      update() {
+        // Clear canvas completely for transparent background
+        this.ctx.clearRect(0, 0, this.width, this.height);
+        
+        this.attractors.forEach(attractor => {
+          // Calculate next point using Lorenz equations
+          const [dx, dy, dz] = this.lorenzEquations(attractor.x, attractor.y, attractor.z);
+          
+          attractor.x += dx;
+          attractor.y += dy;
+          attractor.z += dz;
+          
+          // Project to 2D
+          const [screenX, screenY] = this.projectTo2D(attractor.x, attractor.y, attractor.z);
+          
+          // Add to trail
+          attractor.trail.push([screenX, screenY]);
+          
+          // Limit trail length
+          if (attractor.trail.length > this.maxTrailLength) {
+            attractor.trail.shift();
+          }
+          
+          // Draw trail with gradient
+          this.drawTrail(attractor);
+        });
+      }
+      
+      drawTrail(attractor) {
+        if (attractor.trail.length < 2) return;
+        
+        this.ctx.globalCompositeOperation = 'lighter';
+        this.ctx.strokeStyle = attractor.color;
+        this.ctx.lineWidth = 1.5;
+        this.ctx.globalAlpha = 0.4;
+        
+        // Simple continuous path for maximum performance
+        this.ctx.beginPath();
+        this.ctx.moveTo(attractor.trail[0][0], attractor.trail[0][1]);
+        
+        // Draw every 2nd point for performance while maintaining smoothness
+        for (let i = 2; i < attractor.trail.length; i += 2) {
+          this.ctx.lineTo(attractor.trail[i][0], attractor.trail[i][1]);
+        }
+        
+        // Always include the last point
+        if (attractor.trail.length > 1) {
+          this.ctx.lineTo(attractor.trail[attractor.trail.length - 1][0], attractor.trail[attractor.trail.length - 1][1]);
+        }
+        
+        this.ctx.stroke();
+        this.ctx.globalAlpha = 1;
+        this.ctx.globalCompositeOperation = 'source-over';
+      }
+      
+      animate() {
+        this.update();
+        requestAnimationFrame(() => this.animate());
+      }
+    }
+    
+    // Initialize when DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+      const canvas = document.getElementById('lorenzCanvas');
+      new LorenzAttractor(canvas);
+    });
+  </script>
 </body>
 </html>
