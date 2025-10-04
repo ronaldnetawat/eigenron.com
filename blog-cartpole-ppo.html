@@ -127,6 +127,17 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
     
+    .hero-video {
+      width: 400px;
+      height: auto;
+      margin: 10px auto;
+      display: block;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      pointer-events: none;
+      cursor: default;
+    }
+    
     #references ol {
       list-style-type: none;
       counter-reset: ref-counter;
@@ -193,6 +204,11 @@
         </div>
         
         <div class="blog-content">
+          
+            <video class="hero-video" autoplay loop muted playsinline>
+              <source src="cartpole_trained_agent.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
           
             <section id="intro">
               <h2>1. Introduction</h2>
@@ -298,7 +314,7 @@
               </ul>
               <p>
                 For advantage estimation, one can use <strong>Generalized Advantage Estimation (GAE)</strong>, which trades
-                off bias and variance. Our implementation uses a simpler reward-to-go approach.
+                off bias and variance. This implementation uses a simpler reward-to-go approach.
               </p>
             </section>
           
@@ -322,28 +338,45 @@
               <h2>7. Implementation Walkthrough</h2>
               <h3>Policy & Value Networks</h3>
               <p>
-                We use a shared neural network with two heads:
+                We use a shared neural network with two heads (an actor-critic network):
               </p>
               <ul>
-                <li><strong>Policy head</strong>: outputs action probabilities via softmax.</li>
-                <li><strong>Value head</strong>: outputs a scalar estimate of state value.</li>
+                <li><strong>Policy head</strong>: acts as teh actor. Outputs action probabilities via softmax.</li>
+                <li><strong>Value head</strong>: acts as the critic to provide feedback to calculate the value and actor follows this. Outputs a scalar estimate of state value.</li>
               </ul>
           
           <pre><code class="python">
-          class ActorCritic(nn.Module):
-              def __init__(self, state_dim, action_dim):
-                  super().__init__()
-                  self.shared = nn.Sequential(
-                      nn.Linear(state_dim, 64), nn.ReLU(),
-                      nn.Linear(64, 64), nn.ReLU()
-                  )
-                  self.policy = nn.Linear(64, action_dim)
-                  self.value = nn.Linear(64, 1)
-          
-              def forward(self, x):
-                  x = self.shared(x)
-                  return F.softmax(self.policy(x), dim=-1), self.value(x)
-          </code></pre>
+            class ActorCriticNetwork(nn.Module):
+            def __init__(self, state_dim, action_dim, hidden_dim=64):
+                super(ActorCriticNetwork, self).__init__()
+                
+                # Shared feature extractor
+                self.shared = nn.Sequential(
+                    nn.Linear(state_dim, hidden_dim),
+                    nn.Tanh()
+                )
+                
+                # Actor head (policy)
+                self.actor = nn.Sequential(
+                    nn.Linear(hidden_dim, hidden_dim),
+                    nn.Tanh(),
+                    nn.Linear(hidden_dim, action_dim),
+                    nn.Softmax(dim=-1)
+                )
+                
+                # Critic head (value function)
+                self.critic = nn.Sequential(
+                    nn.Linear(hidden_dim, hidden_dim),
+                    nn.Tanh(),
+                    nn.Linear(hidden_dim, 1)
+                )
+            
+            def forward(self, state):
+                features = self.shared(state)
+                action_probs = self.actor(features)
+                state_value = self.critic(features)
+                return action_probs, state_value
+              </code></pre>
           
               <h3>Rollout Collection & Batching</h3>
               <p>
@@ -368,6 +401,72 @@
                 <li><strong>Value loss</strong>: MSE between predicted and actual returns.</li>
                 <li><strong>Entropy loss</strong>: encourages exploration.</li>
               </ul>
+
+                  <h3>PPO Update Rule</h3>
+<pre><code class="python">
+def update(self):
+    """Update policy using PPO"""
+    # Compute last state value for bootstrapping
+    last_state = torch.FloatTensor(self.states[-1]).unsqueeze(0)
+    with torch.no_grad():
+        _, last_value = self.policy(last_state)
+        last_value = last_value.item() if not self.dones[-1] else 0.0
+    
+    # Compute returns and advantages
+    returns = self.compute_returns(last_value)
+    returns = torch.FloatTensor(returns)
+    
+    # Convert buffers to tensors
+    old_states = torch.FloatTensor(np.array(self.states))
+    old_actions = torch.LongTensor(self.actions)
+    old_log_probs = torch.FloatTensor(self.log_probs)
+    old_values = torch.FloatTensor(self.values)
+    
+    # Normalize advantages
+    advantages = returns - old_values
+    advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
+    
+    # PPO update for multiple epochs
+    for epoch in range(self.epochs):
+        indices = np.arange(len(self.states))
+        np.random.shuffle(indices)
+        
+        for start in range(0, len(self.states), self.batch_size):
+            end = start + self.batch_size
+            batch_indices = indices[start:end]
+            
+            batch_states = old_states[batch_indices]
+            batch_actions = old_actions[batch_indices]
+            batch_old_log_probs = old_log_probs[batch_indices]
+            batch_advantages = advantages[batch_indices]
+            batch_returns = returns[batch_indices]
+            
+            # Get current policy predictions
+            action_probs, state_values = self.policy(batch_states)
+            dist = Categorical(action_probs)
+            new_log_probs = dist.log_prob(batch_actions)
+            entropy = dist.entropy().mean()
+            
+            # Importance sampling ratio
+            ratio = torch.exp(new_log_probs - batch_old_log_probs)
+            
+            # Clipped surrogate loss
+            surr1 = ratio * batch_advantages
+            surr2 = torch.clamp(ratio, 1.0 - self.epsilon, 1.0 + self.epsilon) * batch_advantages
+            policy_loss = -torch.min(surr1, surr2).mean()
+            
+            # Value loss
+            value_loss = nn.MSELoss()(state_values.squeeze(), batch_returns)
+            
+            # Total loss
+            loss = policy_loss + 0.5 * value_loss - 0.01 * entropy
+            
+            # Optimize
+            self.optimizer.zero_grad()
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(self.policy.parameters(), 0.5)
+            self.optimizer.step()
+</code></pre>
           
               <h3>Training Loop</h3>
               <p>
@@ -381,12 +480,54 @@
                 <li>Rollout length = 2048</li>
                 <li>Batch epochs = 10</li>
               </ul>
+            <pre><code class="python">
+def train_ppo(episodes=1000, max_steps=500, update_frequency=2048):
+    """Train PPO agent on CartPole environment"""
+    env = gym.make('CartPole-v1')
+    state_dim = env.observation_space.shape[0]
+    action_dim = env.action_space.n
+    
+    agent = PPOAgent(state_dim, action_dim)
+    episode_rewards = []
+    running_reward = 0
+    step_count = 0
+    
+    for episode in tqdm(range(episodes), desc="Training PPO"):
+        state, _ = env.reset()
+        episode_reward = 0
+        done = False
+        
+        while not done:
+            action, log_prob, value = agent.select_action(state)
+            next_state, reward, terminated, truncated, _ = env.step(action)
+            done = terminated or truncated
+            
+            agent.store_transition(state, action, reward, log_prob, value, done)
+            
+            state = next_state
+            episode_reward += reward
+            step_count += 1
+            
+            # Update policy every update_frequency steps
+            if step_count % update_frequency == 0:
+                agent.update()
+        
+        episode_rewards.append(episode_reward)
+        running_reward = 0.05 * episode_reward + (1 - 0.05) * running_reward
+        
+        if len(episode_rewards) >= 100 and np.mean(episode_rewards[-100:]) >= 475:
+            print(f"Solved at episode {episode}! Average reward: {np.mean(episode_rewards[-100:]):.2f}")
+            break
+    
+    env.close()
+    return agent, episode_rewards
+</code></pre>
             </section>
           
             <section id="results">
               <h2>8. Results</h2>
               <p>
-                After training, our PPO agent achieves the maximum score: <strong>500 reward across 5 test runs</strong>.
+                After training, the PPO agent achieves the maximum score: <strong>500 reward across all 5 test runs</strong>.
                 This means the agent successfully balances the pole for the full 500 steps per episode.
               </p>
               <figure>
