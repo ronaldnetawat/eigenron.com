@@ -12,12 +12,21 @@
     <header>
       <h1 class="site-title">eigenron</h1>
       <nav>
-        <a href="#" class="nav-link active">home</a>
-        <a href="#" class="nav-link">blog</a>
+        <a href="index.html" class="nav-link active">home</a>
+        <a href="blogs.html" class="nav-link">blog</a>
         <a href="#" class="nav-link">projects</a>
         <a href="https://x.com/eigenron" class="nav-link" target="_blank">X</a>
         <a href="https://github.com/ronaldnetawat" class="nav-link" target="_blank">GitHub</a>
         <a href="#" class="nav-link">books</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <svg class="theme-icon sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="5"/>
+            <path d="M12 1v6m0 6v6m8.66-7H15m-6 0H3m15.66 7.66l-4.24-4.24m-4.24 0L5.34 4.34m13.32 15.32l-4.24-4.24m-4.24 0L5.34 19.66"/>
+          </svg>
+          <svg class="theme-icon moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
       </nav>
     </header>
     
@@ -228,6 +237,29 @@
       const canvas = document.getElementById('lorenzCanvas');
       new LorenzAttractor(canvas);
     });
+  </script>
+
+  <script>
+    // Theme Toggle Functionality
+    (function() {
+      const themeToggle = document.getElementById('themeToggle');
+      const body = document.body;
+      
+      // Check for saved theme preference or default to light mode
+      const currentTheme = localStorage.getItem('theme') || 'light';
+      if (currentTheme === 'dark') {
+        body.classList.add('dark-mode');
+      }
+      
+      // Toggle theme on button click
+      themeToggle.addEventListener('click', () => {
+        body.classList.toggle('dark-mode');
+        
+        // Save theme preference
+        const theme = body.classList.contains('dark-mode') ? 'dark' : 'light';
+        localStorage.setItem('theme', theme);
+      });
+    })();
   </script>
 </body>
 </html>
