@@ -1,7 +1,6 @@
 /* Disable GitHub Pages/Jekyll default styling */
 body, html {
   background-image: none !important;
-  background-color: #fff !important;
 }
 
 /* Disable any potential theme headers */
@@ -16,6 +15,29 @@ header.site-header,
   border: none !important;
 }
 
+/* CSS Variables for Theme Colors */
+:root {
+  --bg-color: #fff;
+  --text-color: #333;
+  --text-primary: #000;
+  --text-secondary: #666;
+  --link-color: #007acc;
+  --border-color: #eee;
+  --code-bg: #f5f5f5;
+  --blockquote-color: #555;
+}
+
+body.dark-mode {
+  --bg-color: #1a1a1a;
+  --text-color: #d4d4d4;
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a0;
+  --link-color: #4db8ff;
+  --border-color: #333;
+  --code-bg: #2d2d2d;
+  --blockquote-color: #b0b0b0;
+}
+
 /* Reset and base styles */
 * {
   margin: 0;
@@ -24,17 +46,19 @@ header.site-header,
 }
 
 html {
-  background-color: #fff !important;
+  background-color: var(--bg-color) !important;
+  transition: background-color 0.3s ease;
 }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
   line-height: 1.6;
-  color: #333 !important;
-  background-color: #fff !important;
+  color: var(--text-color) !important;
+  background-color: var(--bg-color) !important;
   font-size: 16px;
   margin: 0 !important;
   padding: 0 !important;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Container */
@@ -61,7 +85,7 @@ header {
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 15px;
-  color: #000 !important;
+  color: var(--text-primary) !important;
   background-color: transparent !important;
   background: none !important;
 }
@@ -71,6 +95,7 @@ nav {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
+  align-items: center;
   background-color: transparent !important;
   background: none !important;
   border: none !important;
@@ -79,7 +104,7 @@ nav {
 }
 
 .nav-link {
-  color: #333 !important;
+  color: var(--text-color) !important;
   text-decoration: none !important;
   font-size: 16px;
   transition: color 0.2s ease;
@@ -90,12 +115,12 @@ nav {
 }
 
 .nav-link:hover {
-  color: #666 !important;
+  color: var(--text-secondary) !important;
   background-color: transparent !important;
 }
 
 .nav-link.active {
-  color: #000 !important;
+  color: var(--text-primary) !important;
   font-weight: 500;
   background-color: transparent !important;
 }
@@ -130,7 +155,7 @@ main {
   font-size: 28px;
   font-weight: normal;
   margin-bottom: 10px;
-  color: #000;
+  color: var(--text-primary);
 }
 
 /* Bio section */
@@ -145,7 +170,7 @@ main {
 }
 
 .bio a {
-  color: #007acc;
+  color: var(--link-color);
   text-decoration: none;
 }
 
@@ -157,13 +182,57 @@ main {
 footer {
   margin-top: 60px;
   padding-top: 20px;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--border-color);
 }
 
 footer p {
-  color: #666;
+  color: var(--text-secondary);
   font-size: 14px;
   text-align: center;
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+  margin-left: auto;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1);
+}
+
+.theme-toggle svg {
+  width: 20px;
+  height: 20px;
+  fill: var(--text-color);
+  transition: fill 0.3s ease;
+}
+
+.theme-icon {
+  display: block;
+}
+
+body.dark-mode .sun-icon {
+  display: none;
+}
+
+body.dark-mode .moon-icon {
+  display: block;
+}
+
+body:not(.dark-mode) .sun-icon {
+  display: block;
+}
+
+body:not(.dark-mode) .moon-icon {
+  display: none;
 }
 
 /* Mobile responsiveness */
