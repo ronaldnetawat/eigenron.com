@@ -95,12 +95,25 @@
         // Get actual container dimensions
         const container = this.canvas.parentElement;
         const containerRect = container.getBoundingClientRect();
-        const containerWidth = containerRect.width;
-        const containerHeight = containerRect.height;
+        let containerWidth = containerRect.width;
+        let containerHeight = containerRect.height;
+        
+        // Fallback: if dimensions are 0 or invalid, use computed styles
+        if (containerWidth === 0 || containerHeight === 0) {
+          const computedStyle = window.getComputedStyle(container);
+          containerWidth = parseFloat(computedStyle.width) || 280;
+          containerHeight = parseFloat(computedStyle.height) || 200;
+        }
+        
+        // Ensure minimum dimensions
+        if (containerWidth < 50) containerWidth = 280;
+        if (containerHeight < 50) containerHeight = 200;
         
         // Set optimized resolution for smooth performance
         const pixelRatio = window.devicePixelRatio || 1;
-        const superSamplingRatio = 2; // 2x supersampling for balance of quality and performance
+        // Reduce supersampling on mobile for better performance
+        const isMobileDevice = window.innerWidth <= 768;
+        const superSamplingRatio = isMobileDevice ? 1.5 : 2;
         this.canvas.width = containerWidth * pixelRatio * superSamplingRatio;
         this.canvas.height = containerHeight * pixelRatio * superSamplingRatio;
         
@@ -120,7 +133,8 @@
         
         // Scale proportionally based on container size
         // Base scale for 700px width container
-        const baseScale = 2;
+        // Increase scale on mobile to make it more visible
+        const baseScale = isMobileDevice ? 3 : 2;
         this.scale = baseScale * (containerWidth / 700);
       }
       
@@ -165,9 +179,12 @@
       projectTo2D(x, y, z) {
         // Front view of butterfly - X-Z plane projection centered on screen
         // This shows the classic butterfly shape head-on with wider aspect ratio
+        // On mobile, don't apply the large offset that pushes animation off-screen
+        const isMobile = window.innerWidth <= 768;
+        const yOffset = isMobile ? 0 : -170;
         return [
           this.centerX + x * this.scale * 2,  // 1.5x wider horizontally
-          this.centerY - (z - 15) * this.scale - 170  // Center around z=25 (typical Lorenz center)
+          this.centerY - (z - 15) * this.scale + yOffset  // Center around z=15 (typical Lorenz center)
         ];
       }
       
@@ -202,10 +219,12 @@
       drawTrail(attractor) {
         if (attractor.trail.length < 2) return;
         
+        // Increase visibility on mobile
+        const isMobileDevice = window.innerWidth <= 768;
         this.ctx.globalCompositeOperation = 'lighter';
         this.ctx.strokeStyle = attractor.color;
-        this.ctx.lineWidth = 1.5;
-        this.ctx.globalAlpha = 0.4;
+        this.ctx.lineWidth = isMobileDevice ? 2.5 : 1.5;
+        this.ctx.globalAlpha = isMobileDevice ? 0.7 : 0.4;
         
         // Simple continuous path for maximum performance
         this.ctx.beginPath();
@@ -232,11 +251,40 @@
       }
     }
     
-    // Initialize when DOM is loaded
-    document.addEventListener('DOMContentLoaded', () => {
+    // Initialize when DOM is loaded (only once)
+    let lorenzInitialized = false;
+    function initLorenz() {
+      if (lorenzInitialized) return;
+      
       const canvas = document.getElementById('lorenzCanvas');
-      new LorenzAttractor(canvas);
-    });
+      if (!canvas) return;
+      
+      const container = canvas.parentElement;
+      if (!container) return;
+      
+      // Wait for container to have valid dimensions
+      const checkDimensions = () => {
+        const rect = container.getBoundingClientRect();
+        const computedStyle = window.getComputedStyle(container);
+        const width = rect.width || parseFloat(computedStyle.width) || 0;
+        const height = rect.height || parseFloat(computedStyle.height) || 0;
+        
+        if (width > 0 && height > 0) {
+          lorenzInitialized = true;
+          new LorenzAttractor(canvas);
+        } else {
+          // Retry after a short delay
+          setTimeout(checkDimensions, 50);
+        }
+      };
+      
+      // Start checking after initial delay
+      setTimeout(checkDimensions, 100);
+    }
+    
+    document.addEventListener('DOMContentLoaded', initLorenz);
+    // Also try on window load in case DOMContentLoaded fires too early
+    window.addEventListener('load', initLorenz);
   </script>
 
   <script>

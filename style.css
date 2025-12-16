@@ -128,13 +128,15 @@ nav {
 /* Lorenz Attractor Animation */
 .lorenz-container {
   position: absolute;
-  /* top: 0; */
-  bottom: 270px;
-  right: 90px;
+  bottom: 320px;
+  right: 150px;
   width: 700px;
   height: 500px;
   pointer-events: none;
-  z-index: -1;
+  z-index: 0;
+  overflow: visible; /* Ensure content isn't clipped */
+  visibility: visible !important;
+  opacity: 1;
 }
 
 #lorenzCanvas {
@@ -142,6 +144,8 @@ nav {
   background: transparent;
   width: 100% !important;
   height: 100% !important;
+  min-width: 1px;
+  min-height: 1px;
 }
 
 /* Main content */
@@ -149,6 +153,7 @@ main {
   flex: 1;
   position: relative;
   z-index: 1;
+  min-height: 400px; /* Ensure main has height for absolute positioning */
 }
 
 .greeting {
@@ -275,9 +280,18 @@ body:not(.dark-mode) .moon-icon {
   
   /* Scale animation for tablet */
   .lorenz-container {
-    right: 8px;
+    position: fixed !important;
+    right: 10px;
+    bottom: auto;
+    top: 80px;
     width: 350px;
     height: 250px;
+    z-index: 1;
+    opacity: 0.8;
+  }
+  
+  main {
+    z-index: 2;
   }
 }
 
@@ -316,10 +330,19 @@ body:not(.dark-mode) .moon-icon {
   
   /* Scale animation for mobile */
   .lorenz-container {
-    top: -24px;
-    right: -15px;
-    width: 300px;
-    height: 220px;
+    position: fixed !important;
+    top: 100px;
+    right: 30px;
+    left: auto;
+    bottom: auto;
+    width: 280px;
+    height: 200px;
+    z-index: 1;
+    opacity: 0.8;
+  }
+  
+  main {
+    z-index: 2; /* Text above animation */
   }
 }
 
@@ -349,9 +372,13 @@ body:not(.dark-mode) .moon-icon {
   
   /* Scale animation for landscape mobile */
   .lorenz-container {
+    position: fixed !important;
     right: 5px;
+    top: 60px;
     width: 180px;
     height: 120px;
+    z-index: 1;
+    opacity: 0.8;
   }
 }
   
