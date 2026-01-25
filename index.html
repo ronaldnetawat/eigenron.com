@@ -8,9 +8,24 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- Cinematic Art Backdrop -->
+  <div class="art-backdrop">
+    <div class="art-piece art-piece--1">
+      <img src="claude_00.jpg" alt="" aria-hidden="true">
+    </div>
+    <div class="art-piece art-piece--2">
+      <img src="claude_01.jpg" alt="" aria-hidden="true">
+    </div>
+  </div>
+
   <div class="container">
     <header>
-      <h1 class="site-title">eigenron</h1>
+      <div class="header-brand">
+        <h1 class="site-title">eigenron</h1>
+        <div class="lorenz-container">
+          <canvas id="lorenzCanvas"></canvas>
+        </div>
+      </div>
       <nav>
         <a href="index.html" class="nav-link active">home</a>
         <a href="blogs.html" class="nav-link">blog</a>
@@ -31,10 +46,6 @@
     </header>
     
     <main>
-      <!-- Lorenz Attractor Animation Background -->
-      <div class="lorenz-container">
-        <canvas id="lorenzCanvas"></canvas>
-      </div>
       <h2 class="greeting">hi, i'm ron!</h2>
       
       <div class="bio">
@@ -88,37 +99,20 @@
       }
       
       setupCanvas() {
-        // Responsive size based on container
+        // Larger inline canvas next to title
         this.canvas.style.width = '100%';
         this.canvas.style.height = '100%';
         
-        // Get actual container dimensions
-        const container = this.canvas.parentElement;
-        const containerRect = container.getBoundingClientRect();
-        let containerWidth = containerRect.width;
-        let containerHeight = containerRect.height;
+        // Fixed internal dimensions for consistent butterfly rendering
+        const fixedWidth = 200;
+        const fixedHeight = 150;
         
-        // Fallback: if dimensions are 0 or invalid, use computed styles
-        if (containerWidth === 0 || containerHeight === 0) {
-          const computedStyle = window.getComputedStyle(container);
-          containerWidth = parseFloat(computedStyle.width) || 280;
-          containerHeight = parseFloat(computedStyle.height) || 200;
-        }
-        
-        // Ensure minimum dimensions
-        if (containerWidth < 50) containerWidth = 280;
-        if (containerHeight < 50) containerHeight = 200;
-        
-        // Set optimized resolution for smooth performance
+        // Set canvas resolution with pixel ratio for sharpness
         const pixelRatio = window.devicePixelRatio || 1;
-        // Reduce supersampling on mobile for better performance
-        const isMobileDevice = window.innerWidth <= 768;
-        const superSamplingRatio = isMobileDevice ? 1.5 : 2;
-        this.canvas.width = containerWidth * pixelRatio * superSamplingRatio;
-        this.canvas.height = containerHeight * pixelRatio * superSamplingRatio;
+        this.canvas.width = fixedWidth * pixelRatio * 2;
+        this.canvas.height = fixedHeight * pixelRatio * 2;
         
-        this.ctx.scale(pixelRatio * superSamplingRatio, pixelRatio * superSamplingRatio);
-        this.ctx.strokeWidth = 1.0;
+        this.ctx.scale(pixelRatio * 2, pixelRatio * 2);
         
         // Enable high-quality rendering for smooth lines
         this.ctx.imageSmoothingEnabled = true;
@@ -126,31 +120,18 @@
         this.ctx.lineCap = 'round';
         this.ctx.lineJoin = 'round';
         
-        this.width = containerWidth;
-        this.height = containerHeight;
+        this.width = fixedWidth;
+        this.height = fixedHeight;
         this.centerX = this.width / 2;
         this.centerY = this.height / 2;
         
-        // Scale proportionally based on container size
-        // Base scale for 700px width container
-        // Increase scale on mobile to make it more visible
-        const baseScale = isMobileDevice ? 3 : 2;
-        this.scale = baseScale * (containerWidth / 700);
+        // Larger scale for more prominent display
+        this.scale = 1.4;
       }
       
       setupEventListeners() {
-        let resizeTimeout;
-        window.addEventListener('resize', () => {
-          clearTimeout(resizeTimeout);
-          resizeTimeout = setTimeout(() => {
-            // Clear trails and repopulate for new dimensions
-            this.attractors.forEach(attractor => {
-              attractor.trail = [];
-            });
-            this.setupCanvas();
-            this.prePopulateTrails();
-          }, 150);
-        });
+        // No resize handling needed - canvas uses fixed internal dimensions
+        // CSS handles the visual scaling of the container
       }
       
       prePopulateTrails() {
@@ -177,14 +158,10 @@
       }
       
       projectTo2D(x, y, z) {
-        // Front view of butterfly - X-Z plane projection centered on screen
-        // This shows the classic butterfly shape head-on with wider aspect ratio
-        // On mobile, don't apply the large offset that pushes animation off-screen
-        const isMobile = window.innerWidth <= 768;
-        const yOffset = isMobile ? 0 : -170;
+        // Front view of butterfly - X-Z plane projection centered in small canvas
         return [
-          this.centerX + x * this.scale * 2,  // 1.5x wider horizontally
-          this.centerY - (z - 15) * this.scale + yOffset  // Center around z=15 (typical Lorenz center)
+          this.centerX + x * this.scale * 1.5,
+          this.centerY - (z - 25) * this.scale
         ];
       }
       
@@ -219,12 +196,11 @@
       drawTrail(attractor) {
         if (attractor.trail.length < 2) return;
         
-        // Increase visibility on mobile
-        const isMobileDevice = window.innerWidth <= 768;
+        // Styling for larger inline display
         this.ctx.globalCompositeOperation = 'lighter';
         this.ctx.strokeStyle = attractor.color;
-        this.ctx.lineWidth = isMobileDevice ? 2.5 : 1.5;
-        this.ctx.globalAlpha = isMobileDevice ? 0.7 : 0.4;
+        this.ctx.lineWidth = 1.2;
+        this.ctx.globalAlpha = 0.45;
         
         // Simple continuous path for maximum performance
         this.ctx.beginPath();
