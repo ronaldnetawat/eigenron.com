@@ -65,139 +65,128 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Cinematic Art Strip — paintings as a horizontal gallery backdrop
+   Painting — positioned right-bottom with denoising animation
    ═══════════════════════════════════════════════════════════════════ */
 
-.art-backdrop {
+.painting-reveal {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 280px;
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  gap: 60px;
-  padding: 0 80px 40px;
-  pointer-events: none;
+  bottom: -40px;
+  right: -60px;
+  width: 650px;
+  height: 520px;
   z-index: 0;
-  /* Subtle gradient fade at top */
-  mask-image: linear-gradient(to top, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
-  -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
+  pointer-events: none;
+  overflow: visible;
 }
 
-.art-piece {
-  flex-shrink: 0;
-  overflow: hidden;
-  border-radius: 4px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-}
-
-body.dark-mode .art-piece {
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-}
-
-.art-piece img {
+.painting-reveal img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  animation: diffusionReveal 4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  border-radius: 8px;
+  box-shadow: 
+    0 25px 80px rgba(0, 0, 0, 0.12),
+    0 10px 30px rgba(0, 0, 0, 0.08);
+  /* Denoising animation — reverse diffusion */
+  animation: denoise 4.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-.art-piece--1 {
-  width: 320px;
-  height: 220px;
+body.dark-mode .painting-reveal img {
+  box-shadow: 
+    0 25px 80px rgba(0, 0, 0, 0.4),
+    0 10px 30px rgba(0, 0, 0, 0.3);
+  animation: denoiseDark 4.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-.art-piece--1 img {
-  animation-delay: 0.3s;
-}
-
-.art-piece--2 {
-  width: 280px;
-  height: 200px;
-}
-
-.art-piece--2 img {
-  animation-delay: 0.6s;
-}
-
-/* Reverse diffusion: noisy/pixelated → clear (like denoising) */
-@keyframes diffusionReveal {
+/* Denoising animation — simulating reverse diffusion process */
+@keyframes denoise {
   0% {
-    filter: blur(40px) grayscale(100%) brightness(1.3) contrast(0.4);
+    /* Pure noise state — heavily pixelated/blurred, no structure */
+    filter: blur(60px) grayscale(100%) brightness(1.4) contrast(0.3);
     opacity: 0;
-    transform: scale(1.15);
+    transform: scale(1.15) rotate(1deg);
   }
-  10% {
-    filter: blur(30px) grayscale(90%) brightness(1.2) contrast(0.5);
-    opacity: 0.1;
+  8% {
+    /* t=900 — first hints of structure emerge */
+    filter: blur(45px) grayscale(95%) brightness(1.3) contrast(0.4);
+    opacity: 0.2;
   }
-  25% {
-    filter: blur(18px) grayscale(70%) brightness(1.1) contrast(0.6);
-    opacity: 0.3;
+  18% {
+    /* t=750 — broad shapes becoming visible */
+    filter: blur(32px) grayscale(85%) brightness(1.2) contrast(0.5);
+    opacity: 0.35;
   }
-  40% {
-    filter: blur(10px) grayscale(50%) brightness(1.05) contrast(0.75);
+  30% {
+    /* t=600 — composition emerges */
+    filter: blur(22px) grayscale(70%) brightness(1.12) contrast(0.6);
     opacity: 0.5;
   }
-  55% {
-    filter: blur(5px) grayscale(30%) brightness(1.02) contrast(0.85);
-    opacity: 0.7;
+  44% {
+    /* t=450 — details starting to form */
+    filter: blur(14px) grayscale(50%) brightness(1.06) contrast(0.72);
+    opacity: 0.65;
   }
-  70% {
-    filter: blur(2px) grayscale(15%) brightness(1.01) contrast(0.92);
-    opacity: 0.85;
+  58% {
+    /* t=300 — colors emerging */
+    filter: blur(8px) grayscale(30%) brightness(1.03) contrast(0.82);
+    opacity: 0.78;
   }
-  85% {
-    filter: blur(0.5px) grayscale(5%) brightness(1) contrast(0.98);
+  72% {
+    /* t=150 — fine details resolving */
+    filter: blur(4px) grayscale(15%) brightness(1.01) contrast(0.9);
+    opacity: 0.88;
+  }
+  86% {
+    /* t=50 — nearly complete */
+    filter: blur(1.5px) grayscale(5%) brightness(1) contrast(0.96);
     opacity: 0.95;
   }
   100% {
+    /* t=0 — fully denoised, clean image */
     filter: blur(0px) grayscale(0%) brightness(1) contrast(1);
     opacity: 1;
-    transform: scale(1);
+    transform: scale(1) rotate(0deg);
   }
 }
 
-body.dark-mode .art-piece img {
-  animation: diffusionRevealDark 4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@keyframes diffusionRevealDark {
+@keyframes denoiseDark {
   0% {
-    filter: blur(40px) grayscale(100%) brightness(0.6) contrast(0.4);
+    filter: blur(60px) grayscale(100%) brightness(0.5) contrast(0.3);
     opacity: 0;
-    transform: scale(1.15);
+    transform: scale(1.15) rotate(1deg);
   }
-  10% {
-    filter: blur(30px) grayscale(90%) brightness(0.7) contrast(0.5);
-    opacity: 0.08;
+  8% {
+    filter: blur(45px) grayscale(95%) brightness(0.55) contrast(0.4);
+    opacity: 0.15;
   }
-  25% {
-    filter: blur(18px) grayscale(70%) brightness(0.8) contrast(0.6);
-    opacity: 0.2;
+  18% {
+    filter: blur(32px) grayscale(85%) brightness(0.6) contrast(0.5);
+    opacity: 0.28;
   }
-  40% {
-    filter: blur(10px) grayscale(50%) brightness(0.85) contrast(0.75);
-    opacity: 0.35;
+  30% {
+    filter: blur(22px) grayscale(70%) brightness(0.68) contrast(0.6);
+    opacity: 0.4;
   }
-  55% {
-    filter: blur(5px) grayscale(30%) brightness(0.9) contrast(0.85);
-    opacity: 0.5;
+  44% {
+    filter: blur(14px) grayscale(50%) brightness(0.75) contrast(0.72);
+    opacity: 0.52;
   }
-  70% {
-    filter: blur(2px) grayscale(15%) brightness(0.95) contrast(0.92);
+  58% {
+    filter: blur(8px) grayscale(30%) brightness(0.82) contrast(0.82);
     opacity: 0.65;
   }
-  85% {
-    filter: blur(0.5px) grayscale(5%) brightness(0.98) contrast(0.98);
-    opacity: 0.8;
+  72% {
+    filter: blur(4px) grayscale(15%) brightness(0.88) contrast(0.9);
+    opacity: 0.78;
+  }
+  86% {
+    filter: blur(1.5px) grayscale(5%) brightness(0.94) contrast(0.96);
+    opacity: 0.88;
   }
   100% {
     filter: blur(0px) grayscale(0%) brightness(1) contrast(1);
-    opacity: 0.9;
-    transform: scale(1);
+    opacity: 0.95;
+    transform: scale(1) rotate(0deg);
   }
 }
 
@@ -453,28 +442,18 @@ body:not(.dark-mode) .moon-icon {
    Responsive Design
    ═══════════════════════════════════════════════════════════════════ */
 
-@media screen and (max-width: 1024px) {
-  .art-backdrop {
-    height: 220px;
-    gap: 40px;
-    padding: 0 40px 30px;
-  }
-  
-  .art-piece--1 {
-    width: 260px;
-    height: 180px;
-  }
-  
-  .art-piece--2 {
-    width: 220px;
-    height: 160px;
+@media screen and (max-width: 1200px) {
+  .painting-reveal {
+    width: 500px;
+    height: 400px;
+    bottom: -30px;
+    right: -40px;
   }
 }
 
 @media screen and (max-width: 768px) {
   .container {
     padding: 24px 28px;
-    padding-bottom: 200px; /* Space for art */
   }
   
   header {
@@ -493,8 +472,8 @@ body:not(.dark-mode) .moon-icon {
   }
   
   .lorenz-container {
-    width: 80px;
-    height: 60px;
+    width: 100px;
+    height: 70px;
   }
   
   nav {
@@ -515,20 +494,11 @@ body:not(.dark-mode) .moon-icon {
     margin-bottom: 20px;
   }
   
-  .art-backdrop {
-    height: 180px;
-    gap: 24px;
-    padding: 0 20px 20px;
-  }
-  
-  .art-piece--1 {
-    width: 180px;
-    height: 130px;
-  }
-  
-  .art-piece--2 {
-    width: 160px;
-    height: 115px;
+  .painting-reveal {
+    width: 350px;
+    height: 280px;
+    bottom: -20px;
+    right: -30px;
   }
   
   main {
@@ -539,7 +509,6 @@ body:not(.dark-mode) .moon-icon {
 @media screen and (max-width: 480px) {
   .container {
     padding: 20px 20px;
-    padding-bottom: 170px;
   }
   
   .site-title {
@@ -547,8 +516,8 @@ body:not(.dark-mode) .moon-icon {
   }
   
   .lorenz-container {
-    width: 70px;
-    height: 52px;
+    width: 80px;
+    height: 60px;
   }
   
   nav {
@@ -570,20 +539,11 @@ body:not(.dark-mode) .moon-icon {
     line-height: 1.7;
   }
   
-  .art-backdrop {
-    height: 140px;
-    gap: 16px;
-    padding: 0 16px 16px;
-  }
-  
-  .art-piece--1 {
-    width: 140px;
-    height: 100px;
-  }
-  
-  .art-piece--2 {
-    width: 120px;
-    height: 88px;
+  .painting-reveal {
+    width: 260px;
+    height: 210px;
+    bottom: -15px;
+    right: -20px;
   }
   
   main {
@@ -595,7 +555,6 @@ body:not(.dark-mode) .moon-icon {
 @media screen and (max-height: 500px) and (orientation: landscape) {
   .container {
     padding: 16px 24px;
-    padding-bottom: 16px;
   }
   
   header {
@@ -616,8 +575,11 @@ body:not(.dark-mode) .moon-icon {
     margin-top: 50px;
   }
   
-  .art-backdrop {
-    display: none;
+  .painting-reveal {
+    width: 220px;
+    height: 175px;
+    bottom: -10px;
+    right: -15px;
   }
 }
 
