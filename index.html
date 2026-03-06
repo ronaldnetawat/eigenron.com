@@ -42,21 +42,68 @@
     </header>
     
     <main>
-      <h2 class="greeting">hi, i'm ron!</h2>
-      
-      <div class="bio">
-        <p>i am a research engineer based in San Francisco!</p>
+      <section class="intro-grid">
+        <div class="intro-copy">
+          <p class="eyebrow">mathematics / art / intelligence / self-reference</p>
+          <h2 class="greeting">hi, i'm ron.</h2>
+          <p class="lede">things that i am interested in / constantly think about:</p>
+          <ul class="interest-list">
+            <li>strange loops and reflective fixed points</li>
+            <li>constructor-theoretic accounts of intelligence</li>
+            <li>integrated information and causal structure</li>
+            <li>learned world models as policy substrates</li>
+            <li>flow matching and generative transport</li>
+            <li>embodied inference in robotic systems</li>
+            <li>self-referential agents and program equilibria</li>
+            <li>decision theory under reflection</li>
+            <li>end-to-end policy learning inside simulated worlds</li>
+          </ul>
+        </div>
 
-        <p>i am currently a founding research engineer at <a href="https://antimlabs.com" target="_blank">Antim Labs</a>, working on scaling RL, advancing reasoning gaming agents, transfer learning, and world models.</p>
-        
-        <p>i studied <strong>physics</strong>, <strong>math</strong> and <strong>computer science</strong> (and often, philosophy) in my undergrad. i've researched <strong>phase qubits</strong> for my senior (theoretical) research.</p>
-        
-        <p>i love ablation and coding things up from scratch. things i've built: <strong>GPT-2</strong>, <strong>Llama-2/3</strong>, <strong>Stable Diffusion-v1.5</strong>, <strong>Diffusion-based ESM</strong>, <strong>Physics-aware Autograd Engine</strong>, <strong>VAE + MDN-RNN World Model</strong>, <strong>Chess Engine</strong>, etc.</p>
-        
-        <p>i like to tweet: <a href="https://x.com/eigenron" target="_blank">@eigenron</a></p>
+        <aside class="ascii-panel ascii-panel-primary" aria-labelledby="asciiPrimaryLabel">
+          <div class="ascii-panel-header">
+            <span id="asciiPrimaryLabel">rotating study i</span>
+            <span>knot / projection</span>
+          </div>
+          <pre class="ascii-art" id="asciiPrimary" aria-hidden="true"></pre>
+          <p class="ascii-caption">a rotating toroidal knot rendered as text, hovering somewhere between notebook marginalia and machine vision.</p>
+        </aside>
+      </section>
 
-        <p><i><strong>Note</strong>: my site was previously <a href="https://eigenron.bearblog.dev/" target="_blank">this</a>, but i'm moving it here, and thus this site is a work in progress</i> :)</p>
-      </div>
+      <section class="notes-grid">
+        <div class="bio">
+          <p>i am currently at <a href="https://antimlabs.com" target="_blank">Antim Labs</a>, working on solving intelligence.</p>
+          
+          <p>i studied <strong>physics</strong>, <strong>math</strong>, and <strong>computer science</strong>, with a persistent drift toward philosophy. my senior theoretical work explored <strong>phase qubits</strong>.</p>
+          
+          <p>i like ablations, first-principles implementations, and the aesthetic of understanding something deeply enough to rebuild them.
+          
+          <p>you can reach me on X: <a href="https://x.com/eigenron" target="_blank">@eigenron</a> or email: <a href="mailto:ronnetawat@gmail.com">ronnetawat@gmail.com</a>.</p>
+
+          <p><i><strong>note</strong>: this site is migrating from <a href="https://eigenron.bearblog.dev/" target="_blank">bearblog</a>, so some rooms are still under construction.</i></p>
+        </div>
+
+        <aside class="side-notes">
+          <div class="axiom-block">
+            <p class="axiom-label">current motifs</p>
+            <ul class="axiom-list">
+              <li>world models and latent geometry</li>
+              <li>godel, self-reference, and limits of formal systems</li>
+              <li>generative models with taste</li>
+              <li>mathematical beauty as an engineering prior</li>
+            </ul>
+          </div>
+
+          <div class="ascii-panel ascii-panel-secondary" aria-labelledby="asciiSecondaryLabel">
+            <div class="ascii-panel-header">
+              <span id="asciiSecondaryLabel">rotating study ii</span>
+              <span>lemniscate / orbit</span>
+            </div>
+            <pre class="ascii-art ascii-art-compact" id="asciiSecondary" aria-hidden="true"></pre>
+            <p class="ascii-caption">a slower recursive orbit, like a proof sketch deciding whether it is diagram or language.</p>
+          </div>
+        </aside>
+      </section>
     </main>
   </div>
 
@@ -255,6 +302,192 @@
     document.addEventListener('DOMContentLoaded', initLorenz);
     // Also try on window load in case DOMContentLoaded fires too early
     window.addEventListener('load', initLorenz);
+  </script>
+
+  <script>
+    class AsciiRotor {
+      constructor(element, options) {
+        this.element = element;
+        this.width = options.width;
+        this.height = options.height;
+        this.scale = options.scale;
+        this.distance = options.distance;
+        this.speed = options.speed;
+        this.palette = options.palette;
+        this.points = options.points;
+        this.rotation = options.rotation || { x: 0.8, y: 0.4, z: 0.25 };
+        this.frame = 0;
+        this.lastFrameTime = 0;
+      }
+
+      rotatePoint(point, angleX, angleY, angleZ) {
+        let { x, y, z } = point;
+
+        const sinX = Math.sin(angleX);
+        const cosX = Math.cos(angleX);
+        let y1 = y * cosX - z * sinX;
+        let z1 = y * sinX + z * cosX;
+
+        const sinY = Math.sin(angleY);
+        const cosY = Math.cos(angleY);
+        let x2 = x * cosY + z1 * sinY;
+        let z2 = -x * sinY + z1 * cosY;
+
+        const sinZ = Math.sin(angleZ);
+        const cosZ = Math.cos(angleZ);
+        let x3 = x2 * cosZ - y1 * sinZ;
+        let y3 = x2 * sinZ + y1 * cosZ;
+
+        return { x: x3, y: y3, z: z2 };
+      }
+
+      render(timestamp) {
+        if (timestamp - this.lastFrameTime < 72) {
+          requestAnimationFrame((time) => this.render(time));
+          return;
+        }
+
+        this.lastFrameTime = timestamp;
+        this.frame += 1;
+
+        const chars = Array.from({ length: this.width * this.height }, () => ' ');
+        const depth = new Float32Array(this.width * this.height).fill(-Infinity);
+        const angleX = this.frame * this.speed * this.rotation.x;
+        const angleY = this.frame * this.speed * this.rotation.y;
+        const angleZ = this.frame * this.speed * this.rotation.z;
+
+        for (const point of this.points) {
+          const rotated = this.rotatePoint(point, angleX, angleY, angleZ);
+          const perspective = this.distance / (this.distance - rotated.z);
+          const px = Math.round(this.width / 2 + rotated.x * this.scale * perspective);
+          const py = Math.round(this.height / 2 + rotated.y * this.scale * perspective * 0.58);
+
+          if (px < 0 || px >= this.width || py < 0 || py >= this.height) {
+            continue;
+          }
+
+          const index = py * this.width + px;
+          if (rotated.z <= depth[index]) {
+            continue;
+          }
+
+          const luminance = Math.max(
+            0,
+            Math.min(1, 0.16 + 0.44 * (rotated.z / this.distance + 0.5) + 0.4 * (point.weight || 0.5))
+          );
+          const paletteIndex = Math.min(
+            this.palette.length - 1,
+            Math.floor(luminance * (this.palette.length - 1))
+          );
+
+          depth[index] = rotated.z;
+          chars[index] = this.palette[paletteIndex];
+        }
+
+        const lines = [];
+        for (let row = 0; row < this.height; row += 1) {
+          lines.push(chars.slice(row * this.width, (row + 1) * this.width).join(''));
+        }
+
+        this.element.textContent = lines.join('\n');
+        requestAnimationFrame((time) => this.render(time));
+      }
+
+      start() {
+        requestAnimationFrame((time) => this.render(time));
+      }
+    }
+
+    function buildTorusKnotPoints(total) {
+      const points = [];
+      for (let i = 0; i < total; i += 1) {
+        const t = (i / total) * Math.PI * 2 * 2;
+        const x = (1.65 + 0.55 * Math.cos(3 * t)) * Math.cos(2 * t);
+        const y = (1.65 + 0.55 * Math.cos(3 * t)) * Math.sin(2 * t);
+        const z = 0.95 * Math.sin(3 * t);
+        points.push({ x, y, z, weight: (Math.sin(t * 3) + 1) / 2 });
+      }
+      return points;
+    }
+
+    function buildLemniscatePoints(total) {
+      const points = [];
+      for (let i = 0; i < total; i += 1) {
+        const t = (i / total) * Math.PI * 2;
+        const denominator = 1 + Math.sin(t) * Math.sin(t);
+        const x = (Math.cos(t) / denominator) * 2.1;
+        const y = (Math.sin(t) * Math.cos(t) / denominator) * 2.6;
+        const z = Math.sin(2 * t) * 1.2;
+        points.push({ x, y, z, weight: (Math.cos(2 * t) + 1) / 2 });
+      }
+      return points;
+    }
+
+    function initAsciiArt() {
+      const primary = document.getElementById('asciiPrimary');
+      const secondary = document.getElementById('asciiSecondary');
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (prefersReducedMotion) {
+        if (primary) {
+          primary.textContent = [
+            '           .:-=++=-:.           ',
+            '       .-+#@@@@@@@@@@#+-.       ',
+            '     .-*@@@#*=-..-=*#@@@*-.     ',
+            '    :+@@@*=.          .=*@@+:    ',
+            '    =@@#:    recursive     :#@=   ',
+            '    =@@#:     geometry     :#@=   ',
+            '    :+@@@*=.          .=*@@+:    ',
+            '     .-*@@@#*=-..-=*#@@@*-.     ',
+            '       .-+#@@@@@@@@@@#+-.       ',
+            '           .:-=++=-:.           '
+          ].join('\n');
+        }
+
+        if (secondary) {
+          secondary.textContent = [
+            '         .--==--.         ',
+            '      .-+#@@@@@@#+-.      ',
+            '    .-*@@*=....=*@@*-.    ',
+            '    =@@*:  loop  :*@@=    ',
+            '    =@@*:  self  :*@@=    ',
+            '    .-*@@*=....=*@@*-.    ',
+            '      .-+#@@@@@@#+-.      ',
+            '         .--==--.         '
+          ].join('\n');
+        }
+
+        return;
+      }
+
+      if (primary) {
+        new AsciiRotor(primary, {
+          width: 32,
+          height: 18,
+          scale: 7.2,
+          distance: 8,
+          speed: 0.05,
+          palette: ' .,:-=+*#%@',
+          points: buildTorusKnotPoints(900),
+          rotation: { x: 0.9, y: 0.55, z: 0.22 }
+        }).start();
+      }
+
+      if (secondary) {
+        new AsciiRotor(secondary, {
+          width: 28,
+          height: 12,
+          scale: 5.9,
+          distance: 7,
+          speed: 0.042,
+          palette: ' .-:=+*#%@',
+          points: buildLemniscatePoints(720),
+          rotation: { x: 0.65, y: 0.92, z: 0.18 }
+        }).start();
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', initAsciiArt);
   </script>
 
   <script>
