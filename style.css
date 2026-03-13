@@ -2,49 +2,49 @@
    eigenron — a meditation on code and canvas
    ═══════════════════════════════════════════════════════════════════ */
 
-/* Import elegant serif for headings, refined sans for body, monospaced face for diagrams */
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap');
+/* Import elegant serif faces for headings and body, plus a monospaced face for diagrams */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap');
 
 /* CSS Variables for Theme Colors */
 :root {
-  --bg-color: #0b0908;
-  --card-bg: rgba(247, 242, 233, 0.84);
-  --card-shadow: rgba(23, 18, 15, 0.22);
-  --text-color: #312b28;
-  --text-primary: #171411;
-  --text-secondary: #655c55;
-  --text-muted: #8d8177;
-  --link-color: #39584f;
-  --link-hover: #223731;
-  --border-color: rgba(76, 64, 53, 0.18);
-  --code-bg: rgba(237, 228, 215, 0.9);
+  --bg-color: #e9e3da;
+  --card-bg: #f7f4ee;
+  --card-shadow: rgba(23, 18, 15, 0.14);
+  --text-color: #2d2925;
+  --text-primary: #161311;
+  --text-secondary: #5f5650;
+  --text-muted: #83776d;
+  --link-color: #2f4f45;
+  --link-hover: #1d322c;
+  --border-color: rgba(58, 48, 40, 0.14);
+  --code-bg: #efe7db;
   --blockquote-color: #4d4640;
-  --accent: #8b6439;
-  --accent-soft: rgba(139, 100, 57, 0.12);
-  --panel-bg: rgba(255, 251, 244, 0.58);
+  --accent: #7b5b3b;
+  --accent-soft: rgba(123, 91, 59, 0.08);
+  --panel-bg: #f2ede5;
   --panel-strong: rgba(22, 18, 15, 0.82);
-  --grid-line: rgba(139, 100, 57, 0.08);
+  --grid-line: rgba(123, 91, 59, 0.06);
   --monospace: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
 }
 
 body.dark-mode {
-  --bg-color: #050404;
-  --card-bg: rgba(15, 13, 12, 0.84);
-  --card-shadow: rgba(0, 0, 0, 0.52);
-  --text-color: #d1c7bb;
-  --text-primary: #f0e7dc;
-  --text-secondary: #998d81;
-  --text-muted: #70665f;
-  --link-color: #97b9ae;
-  --link-hover: #d7e4de;
-  --border-color: rgba(203, 180, 156, 0.12);
-  --code-bg: rgba(28, 24, 22, 0.95);
-  --blockquote-color: #b9aea4;
+  --bg-color: #050505;
+  --card-bg: #000000;
+  --card-shadow: rgba(0, 0, 0, 0.48);
+  --text-color: #d8cec1;
+  --text-primary: #f5ede2;
+  --text-secondary: #a39587;
+  --text-muted: #776b60;
+  --link-color: #a6c7bb;
+  --link-hover: #e1ebe7;
+  --border-color: rgba(226, 211, 194, 0.12);
+  --code-bg: #161311;
+  --blockquote-color: #c1b5aa;
   --accent: #d0a46f;
-  --accent-soft: rgba(208, 164, 111, 0.14);
-  --panel-bg: rgba(21, 19, 18, 0.76);
+  --accent-soft: rgba(208, 164, 111, 0.08);
+  --panel-bg: #0b0b0b;
   --panel-strong: rgba(240, 231, 220, 0.9);
-  --grid-line: rgba(208, 164, 111, 0.08);
+  --grid-line: rgba(208, 164, 111, 0.04);
 }
 
 /* Reset and base styles */
@@ -61,11 +61,11 @@ html {
 }
 
 body {
-  font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Newsreader', Georgia, serif;
   line-height: 1.7;
   color: var(--text-color);
   background-color: var(--bg-color);
-  font-size: 16px;
+  font-size: 17px;
   margin: 0;
   padding: 0;
   transition: background-color 0.4s ease, color 0.4s ease;
@@ -87,19 +87,11 @@ body::after {
 }
 
 body::before {
-  background:
-    radial-gradient(circle at 14% 18%, rgba(226, 200, 159, 0.2), transparent 28%),
-    radial-gradient(circle at 82% 22%, rgba(93, 131, 120, 0.16), transparent 24%),
-    linear-gradient(135deg, rgba(10, 9, 8, 0.2), rgba(255, 255, 255, 0));
+  background: none;
 }
 
 body::after {
-  background-image:
-    linear-gradient(to right, transparent, var(--grid-line) 50%, transparent),
-    linear-gradient(to bottom, transparent, var(--grid-line) 50%, transparent);
-  background-size: 160px 160px;
-  opacity: 0.7;
-  mix-blend-mode: soft-light;
+  background: none;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -228,28 +220,18 @@ body.dark-mode .painting-bg img {
 .container {
   position: relative;
   z-index: 1;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 28%),
-    var(--card-bg);
+  background: var(--card-bg);
   border: 1px solid var(--border-color);
   box-shadow: 
-    0 35px 120px var(--card-shadow),
-    0 12px 40px rgba(0, 0, 0, 0.12);
-  backdrop-filter: blur(18px);
+    0 28px 80px var(--card-shadow),
+    0 10px 24px rgba(0, 0, 0, 0.08);
   overflow: hidden;
   animation: cardSlideIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
 }
 
 .content-card::before,
 .container::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background:
-    radial-gradient(circle at top right, rgba(255, 255, 255, 0.22), transparent 28%),
-    radial-gradient(circle at bottom left, var(--accent-soft), transparent 30%);
-  pointer-events: none;
+  content: none;
 }
 
 .content-card {
@@ -329,11 +311,12 @@ nav {
 }
 
 .nav-link {
+  font-family: 'Newsreader', Georgia, serif;
   color: var(--text-secondary);
   text-decoration: none;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 400;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.03em;
   text-transform: lowercase;
   transition: color 0.3s ease;
   position: relative;
@@ -496,19 +479,15 @@ main {
   position: relative;
   padding: 18px 18px 16px;
   border: 1px solid var(--border-color);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0)),
-    var(--panel-bg);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    0 20px 40px rgba(0, 0, 0, 0.08);
+  background: var(--panel-bg);
+  box-shadow: none;
 }
 
 .ascii-panel::after {
   content: '';
   position: absolute;
   inset: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.04);
   pointer-events: none;
 }
 
@@ -738,7 +717,7 @@ main {
   }
   
   .nav-link {
-    font-size: 12px;
+    font-size: 14px;
   }
   
   .greeting {
@@ -785,7 +764,7 @@ main {
   }
   
   .nav-link {
-    font-size: 11px;
+    font-size: 13px;
   }
   
   .greeting {
