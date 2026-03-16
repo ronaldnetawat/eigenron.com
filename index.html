@@ -8,12 +8,6 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Painting Background with Pixelated Denoising -->
-  <div class="painting-bg">
-    <img src="claude_00.jpg" alt="" aria-hidden="true">
-  </div>
-
-  <!-- Content Card floating on the painting -->
   <div class="content-card">
     <header>
       <div class="header-brand">
@@ -41,65 +35,34 @@
     </header>
     
     <main>
-      <section class="intro-grid">
+      <!-- <section class="intro-grid"> -->
         <div class="intro-copy">
-          <p class="eyebrow">mathematics / art / intelligence / self-reference</p>
           <h2 class="greeting">hi, i'm ron.</h2>
-          <p class="lede">things that i am interested in / constantly think about:</p>
-          <ul class="interest-list">
-            <li>strange loops and reflective fixed points</li>
-            <li>constructor-theoretic accounts of intelligence</li>
-            <li>integrated information and causal structure</li>
-            <li>learned world models as policy substrates</li>
-            <li>flow matching and generative transport</li>
-            <li>embodied inference in robotic systems</li>
-            <li>self-referential agents and program equilibria</li>
-            <li>decision theory under reflection</li>
-            <li>end-to-end policy learning inside simulated worlds</li>
-          </ul>
         </div>
 
         <aside class="ascii-panel ascii-panel-primary" aria-labelledby="asciiPrimaryLabel">
-          <div class="ascii-panel-header">
-            <span id="asciiPrimaryLabel">rotating study i</span>
-            <span>knot / projection</span>
-          </div>
+          <span id="asciiPrimaryLabel" class="sr-only">rotating study i</span>
           <pre class="ascii-art" id="asciiPrimary" aria-hidden="true"></pre>
-          <p class="ascii-caption">a rotating toroidal knot rendered as text, hovering somewhere between notebook marginalia and machine vision.</p>
         </aside>
       </section>
 
       <section class="notes-grid">
         <div class="bio">
-          <p>i am currently at <a href="https://antimlabs.com" target="_blank">Antim Labs</a>, working on solving intelligence.</p>
+          <p>i am currently a founding engineer at <i><a href="https://antimlabs.com" target="_blank">Antim Labs</a></i>, working on spatio-temporal intelligence.</p>
           
-          <p>i studied <strong>physics</strong>, <strong>math</strong>, and <strong>computer science</strong>, with a persistent drift toward philosophy. my senior theoretical work explored <strong>phase qubits</strong>.</p>
+          <p>i studied physics, math, CS, and philosophy in college. my senior theoretical work explored <i><a href="https://en.wikipedia.org/wiki/Phase_qubit" target="_blank">phase qubits</a></i>.</p>
           
-          <p>i like ablations, first-principles implementations, and the aesthetic of understanding something deeply enough to rebuild them.</p>
+          <p>i enjoy the aesthetic of understanding technical things deeply enough to rebuild them.</p>
           
-          <p>you can reach me on X: <a href="https://x.com/eigenron" target="_blank">@eigenron</a> or email: <a href="mailto:ronnetawat@gmail.com">ronnetawat@gmail.com</a>.</p>
+          <p>find me on X: <i><a href="https://x.com/eigenron" target="_blank">@eigenron</a></i> or email: <i><a href="mailto:ronnetawat@gmail.com">ronnetawat@gmail.com</a></i>.</p>
 
           <p><i><strong>note</strong>: this site is migrating from <a href="https://eigenron.bearblog.dev/" target="_blank">bearblog</a>, so some rooms are still under construction.</i></p>
         </div>
 
         <aside class="side-notes">
-          <div class="axiom-block">
-            <p class="axiom-label">current motifs</p>
-            <ul class="axiom-list">
-              <li>world models and latent geometry</li>
-              <li>gödel, self-reference, and limits of formal systems</li>
-              <li>generative models with taste</li>
-              <li>mathematical beauty as an engineering prior</li>
-            </ul>
-          </div>
-
           <div class="ascii-panel ascii-panel-secondary" aria-labelledby="asciiSecondaryLabel">
-            <div class="ascii-panel-header">
-              <span id="asciiSecondaryLabel">rotating study ii</span>
-              <span>lemniscate / orbit</span>
-            </div>
+            <span id="asciiSecondaryLabel" class="sr-only">rotating study ii</span>
             <pre class="ascii-art ascii-art-compact" id="asciiSecondary" aria-hidden="true"></pre>
-            <p class="ascii-caption">a slower recursive orbit, like a proof sketch deciding whether it is diagram or language.</p>
           </div>
         </aside>
       </section>
@@ -124,17 +87,18 @@
         this.maxTrailLength = 300;
         this.fadeSpeed = 0.02;
         
-        // Multiple initial conditions with neon colors
+        // Multiple initial conditions in a restrained monochrome palette
         this.attractors = [
-          { x: 1, y: 1, z: 1, trail: [], color: '#00FFFF' },      // Cyan
-          { x: 2, y: 1, z: 1, trail: [], color: '#FF00FF' },      // Magenta
-          { x: 1, y: 2, z: 1, trail: [], color: '#FFFF00' },      // Yellow
-          { x: 1, y: 1, z: 2, trail: [], color: '#00FF00' },      // Green
-          { x: -1, y: -1, z: 1, trail: [], color: '#FF4000' },    // Orange
-          { x: 0.5, y: -0.5, z: 1.5, trail: [], color: '#8000FF' } // Purple
+          { x: 1, y: 1, z: 1, trail: [], color: '' },
+          { x: 2, y: 1, z: 1, trail: [], color: '' },
+          { x: 1, y: 2, z: 1, trail: [], color: '' },
+          { x: 1, y: 1, z: 2, trail: [], color: '' },
+          { x: -1, y: -1, z: 1, trail: [], color: '' },
+          { x: 0.5, y: -0.5, z: 1.5, trail: [], color: '' }
         ];
         
         this.setupEventListeners();
+        this.syncColors();
         this.prePopulateTrails(); // Pre-populate for smooth start
         this.animate();
       }
@@ -174,6 +138,22 @@
         // No resize handling needed - canvas uses fixed internal dimensions
         // CSS handles the visual scaling of the container
       }
+
+      syncColors() {
+        const styles = getComputedStyle(document.body);
+        const palette = [
+          styles.getPropertyValue('--canvas-1').trim(),
+          styles.getPropertyValue('--canvas-2').trim(),
+          styles.getPropertyValue('--canvas-3').trim(),
+          styles.getPropertyValue('--canvas-4').trim(),
+          styles.getPropertyValue('--canvas-5').trim(),
+          styles.getPropertyValue('--canvas-6').trim()
+        ];
+
+        this.attractors.forEach((attractor, index) => {
+          attractor.color = palette[index] || styles.getPropertyValue('--text-primary').trim();
+        });
+      }
       
       prePopulateTrails() {
         // Pre-calculate some trail points for smooth startup
@@ -207,6 +187,8 @@
       }
       
       update() {
+        this.syncColors();
+
         // Clear canvas completely for transparent background
         this.ctx.clearRect(0, 0, this.width, this.height);
         
