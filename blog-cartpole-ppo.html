@@ -12,8 +12,9 @@
     }
     
     .blog-title-main {
+      font-family: 'Cormorant Garamond', Georgia, serif;
       font-size: 32px;
-      font-weight: 600;
+      font-weight: 500;
       margin-bottom: 10px;
       color: var(--text-primary);
     }
@@ -65,7 +66,7 @@
     .blog-content code {
       background-color: var(--code-bg);
       padding: 2px 6px;
-      border-radius: 3px;
+      border: 1px solid var(--border-color);
       font-family: 'Courier New', monospace;
       font-size: 14px;
     }
@@ -73,7 +74,7 @@
     .blog-content pre {
       background-color: var(--code-bg);
       padding: 15px;
-      border-radius: 5px;
+      border: 1px solid var(--border-color);
       overflow-x: auto;
       margin-bottom: 20px;
     }
@@ -97,11 +98,11 @@
       max-width: 100%;
       height: auto;
       margin: 20px 0;
-      border-radius: 5px;
+      border: 1px solid var(--border-color);
     }
     
     .blog-content blockquote {
-      border-left: 3px solid #007acc;
+      border-left: 1px solid var(--text-primary);
       padding-left: 20px;
       margin: 20px 0;
       color: var(--text-secondary);
@@ -123,8 +124,7 @@
     .blog-content video {
       max-width: 100%;
       height: auto;
-      border-radius: 5px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--border-color);
     }
     
     .hero-video {
@@ -132,8 +132,7 @@
       height: auto;
       margin: 10px auto;
       display: block;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      border: 1px solid var(--border-color);
       pointer-events: none;
       cursor: default;
     }
